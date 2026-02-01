@@ -39,6 +39,8 @@ add_executable(SodaDownloader main.cpp
         include/decryptor.cpp
         include/decryptor.h
         include/StscEntry.h
+        src/lyric_convertor.cpp
+        include/lyric_convertor.h
 )
 
 target_link_libraries(SodaDownloader PRIVATE CURL::libcurl)

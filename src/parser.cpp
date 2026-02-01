@@ -98,6 +98,11 @@ std::string parser::get_track_artist() const
     return track_artist;
 }
 
+std::string parser::get_lyric_krc() const
+{
+    return lyric_krc;
+}
+
 const music_info* parser::get_music_info() const
 {
     const music_info* info = nullptr;

@@ -18,7 +18,7 @@ string utils::extract_link(const string& link)
     return "";
 }
 
-bool utils::write_to_file(const std::string& file_path, const std::string& content, bool append)
+bool utils::write_to_file(const std::string& file_path, const std::string& content, const bool append)
 {
     std::ofstream ofs;
 

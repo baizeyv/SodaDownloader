@@ -82,6 +82,13 @@ public:
      */
     [[nodiscard]]
     std::string get_track_artist() const;
+    
+    /**
+     * * 获取歌词
+     * @return 
+     */
+    [[nodiscard]]
+    std::string get_lyric_krc() const;
 
     /**
      * * 获取最优歌曲信息

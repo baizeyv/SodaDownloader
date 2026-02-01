@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 
 #include "include/decryptor.h"
+#include "include/lyric_convertor.h"
 #include "include/utils.h"
 
 using namespace std;
@@ -101,6 +102,8 @@ int main(int argc, char* argv[])
     {
         cerr << "[!] music info is null." << endl;
     }
+    
+    lyric_convertor::save_lrc(output, p);
 
     initializer::dispose();
     
