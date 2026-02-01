@@ -4,7 +4,6 @@
 
 #ifndef SODADOWNLOADER_REQUESTER_H
 #define SODADOWNLOADER_REQUESTER_H
-#include <map>
 #include <string>
 #include <curl/curl.h>
 
@@ -62,13 +61,6 @@ public:
      */
     static void request_media(const std::string& p_url);
 
-    /**
-     * * 发送解密请求
-     * @param file_path 
-     * @param spade_a 
-     */
-    static void request_decrypt(const std::string& file_path, const std::string& spade_a);
-
 private:
     /**
      * * 回调函数：处理字符串流
@@ -79,6 +71,7 @@ private:
      * @return 
      */
     static size_t write_callback(void* contents, size_t size, size_t nmemb, std::string* userp);
+    
     /**
      * * 回调函数：处理字符串流
      * @param contents 
@@ -89,13 +82,6 @@ private:
      */
     static size_t write_media_callback(void* contents, size_t size, size_t nmemb, FILE* userp);
 
-    /**
-     * * 构造请求参数
-     * @param curl 
-     * @param params 
-     * @return 
-     */
-    static std::string build_query_params(CURL* curl, const std::map<std::string, std::string>& params);
 };
 
 

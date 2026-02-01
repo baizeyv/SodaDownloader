@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(CURL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(Iconv REQUIRED)
 # --- vcpkg 路径手动指定 (确保路径正确) ---
 set(VCPKG_ROOT "D:/Environment/vcpkg/installed/x64-windows")
 
@@ -30,16 +31,21 @@ add_executable(SodaDownloader main.cpp
         include/initializer.h
         src/initializer.cpp
         src/utils.cpp
+        src/mp4_box.cpp
         include/utils.h
         include/music_info.h
         include/mp4_box.h
         include/box.h
+        include/decryptor.cpp
+        include/decryptor.h
+        include/StscEntry.h
 )
 
 target_link_libraries(SodaDownloader PRIVATE CURL::libcurl)
 target_link_libraries(SodaDownloader PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(SodaDownloader PRIVATE OpenSSL::SSL)
 target_link_libraries(SodaDownloader PRIVATE OpenSSL::Crypto)
+target_link_libraries(SodaDownloader PRIVATE Iconv::Iconv)
 
 # 5. 链接库
 if(LEXBOR_INCLUDE_DIR AND LEXBOR_LIBRARY)

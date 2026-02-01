@@ -19,35 +19,38 @@ void parser::inject_shared_page(const std::string& html_content)
     lxb_html_parser_t* parser = lxb_html_parser_create();
     lxb_status_t status = lxb_html_parser_init(parser);
     if (status != LXB_STATUS_OK) return;
-    
-    lxb_html_document_t* document = lxb_html_parse(parser, (const uint8_t*)html_content.c_str(), html_content.length());
-    
+
+    lxb_html_document_t* document = lxb_html_parse(parser, reinterpret_cast<const uint8_t*>(html_content.c_str()), html_content.length());
+
     // # 从根节点开始遍历寻找
     auto data = find_router_data(lxb_dom_interface_node(document->body));
-    
+
     std::string router_data_dirty(data);
-    
+
     lxb_html_document_destroy(document);
     lxb_html_parser_destroy(parser);
-    
+
     auto router_data = clean_json_content(router_data_dirty);
-    
+
     auto json_content = nlohmann::json::parse(router_data);
     track_id = json_content["loaderData"]["track_page"]["track_id"];
     track_title = json_content["loaderData"]["track_page"]["audioWithLyricsOption"]["trackName"];
     track_artist = json_content["loaderData"]["track_page"]["audioWithLyricsOption"]["artistName"];
-    
+
+    track_title = utils::convert_encoding(track_title, "UTF-8", "GBK");
+    track_artist = utils::convert_encoding(track_artist, "UTF-8", "GBK");
+
     std::cout << "track_id: " << track_id << " title: " << track_title << " artist: " << track_artist << std::endl;
-    
 }
 
 void parser::inject_track_v2(const std::string& track_v2_content)
 {
     auto track_json_data = nlohmann::json::parse(track_v2_content);
     album = track_json_data["track"]["album"]["name"];
+    album = utils::convert_encoding(album, "UTF-8", "GBK");
     lyric_krc = track_json_data["lyric"]["content"];
     video_model = track_json_data["track_player"]["video_model"];
-    
+
     auto model_json_data = nlohmann::json::parse(video_model);
     auto list = model_json_data["video_list"];
     if (list.is_array())
@@ -67,12 +70,14 @@ void parser::inject_track_v2(const std::string& track_v2_content)
                     info.bitrate = item["video_meta"].value("bitrate", 0);
                 }
                 model_map.push_back(info);
-            } catch (std::exception& e)
+            }
+            catch (std::exception& e)
             {
                 std::cerr << "解析单元出错: " << e.what() << std::endl;
             }
         }
-    } else
+    }
+    else
     {
         std::cerr << "video_model error!" << std::endl;
     }
@@ -81,6 +86,16 @@ void parser::inject_track_v2(const std::string& track_v2_content)
 std::string parser::get_track_id() const
 {
     return track_id;
+}
+
+std::string parser::get_track_title() const
+{
+    return track_title;
+}
+
+std::string parser::get_track_artist() const
+{
+    return track_artist;
 }
 
 const music_info* parser::get_music_info() const
@@ -166,7 +181,7 @@ std::string parser::clean_json_content(const std::string& data_dirty)
 
     if (end != std::string::npos)
     {
-        // 截取从第一个 '{' 到最后一个 '}' 的内容
+        // # 截取从第一个 '{' 到最后一个 '}' 的内容
         return data_dirty.substr(start, end - start + 1);
     }
 

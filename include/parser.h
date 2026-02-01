@@ -6,6 +6,7 @@
 #define SODADOWNLOADER_PARSER_H
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include <lexbor/dom/interface.h>
 
 #include "music_info.h"
@@ -67,6 +68,20 @@ public:
      */
     [[nodiscard]] 
     std::string get_track_id() const;
+
+    /**
+     * * 获取歌曲名称
+     * @return 
+     */
+    [[nodiscard]]
+    std::string get_track_title() const;
+    
+    /**
+     * * 获取演唱者
+     * @return 
+     */
+    [[nodiscard]]
+    std::string get_track_artist() const;
 
     /**
      * * 获取最优歌曲信息

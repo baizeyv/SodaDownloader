@@ -113,7 +113,8 @@ void requester::request_media(const std::string& p_url)
     CURL* curl = curl_easy_init();
     if (!curl) return;
 
-    const auto out_filename = "./tmp/download.tmp";
+    const auto root = utils::get_save_root().string();
+    const auto out_filename = root + "/download.tmp";
 
     try
     {
@@ -139,7 +140,7 @@ void requester::request_media(const std::string& p_url)
     }
 
     // 以二进制写入模式打开文件
-    FILE* fp = fopen(out_filename, "wb");
+    FILE* fp = fopen(out_filename.c_str(), "wb");
     if (!fp)
     {
         std::cerr << "无法创建文件: " << out_filename << std::endl;
@@ -173,30 +174,6 @@ void requester::request_media(const std::string& p_url)
         return;
     }
 
-    curl_easy_cleanup(curl);
-}
-
-void requester::request_decrypt(const std::string& file_path, const std::string& spade_a)
-{
-    const std::string json = "{ \"key\": " + spade_a + ", \"path\": " + file_path + " }";
-
-    CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, "http://127.0.0.1:5000/open");
-    // curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
-    // curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, json.size());
-
-    struct curl_slist* headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-    std::string outBuffer;
-
-    // 接收解密后的数据
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &outBuffer);
-
-    curl_easy_perform(curl);
     curl_easy_cleanup(curl);
 }
 
