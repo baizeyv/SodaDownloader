@@ -4,8 +4,8 @@
 
 #include "decryptor.h"
 
-#include <iomanip>
 #include <iostream>
+#include <process.h>
 #include <stdexcept>
 #include <unordered_set>
 #include <openssl/evp.h>
@@ -358,6 +358,7 @@ void decryptor::decrypt(const string& spade_a, const string& output_path, const 
 {
     const auto root = utils::get_save_root().string();
     string filePath = root + "/download.tmp";
+    utils::replace_all(filePath, "\\", "/");
 
     vector<uint8_t> fileData = utils::readFile(filePath);
 
@@ -411,7 +412,7 @@ void decryptor::decrypt(const string& spade_a, const string& output_path, const 
     if (senc.empty())
     {
         cerr << "未找到加密信息 (senc)" << endl;
-        return ;
+        return;
     }
 
     auto ivs = parseSenc(senc.data);
@@ -461,23 +462,44 @@ void decryptor::decrypt(const string& spade_a, const string& output_path, const 
     }
     else
     {
-        cout << "[*] 重建 MP4 容器..." << endl;
-        auto ftypSize = ftyp.empty() ? 0 : ftyp.size;
-        auto dummyMoov = processBoxTree(fileData, moov.offset, moov.size, 0);
-        uint32_t newMdatOffset = ftypSize + dummyMoov.size() + 8 + 8;
-
-        auto cleanMoovData = processBoxTree(fileData, moov.offset, moov.size, newMdatOffset);
-        auto cleanMoov = buildBox(cleanMoovData, "moov");
-        auto mDatData = utils::concatUint8Arrays(decryptedSamples);
-        auto newMdat = buildBox(mDatData, "mdat");
-
-        if (!ftyp.empty())
-        {
-            fileData.insert(fileData.end(), fileData.begin() + ftyp.offset, fileData.begin() + ftyp.offset + ftyp.size);
-        }
-        fileData.insert(fileData.end(), cleanMoov.begin(), cleanMoov.end());
-        fileData.insert(fileData.end(), newMdat.begin(), newMdat.end());
         finalExt = ".m4a"; // ? 这里也可以是mp4
+
+        auto exe = utils::get_m4a_decrypt_exe_path();
+        utils::replace_all(exe, "\\", "/");
+        string out = output_path + "/" + ps.get_track_title() + " - " + ps.get_track_artist() + finalExt;
+        string cmd = "\"" + exe + "\" \"" + filePath + "\" \"" + spade_a + "\" \"" + out + "\"";
+        
+        auto arg_out = "\"" + out + "\"";
+        
+        const char* args[] = {
+            exe.c_str(),
+            filePath.c_str(),
+            spade_a.c_str(),
+            arg_out.c_str(),
+            nullptr
+        };
+        _spawnv(_P_WAIT, exe.c_str(), args);
+
+        return;
+
+
+        // cout << "[*] 重建 MP4 容器..." << endl;
+        // auto ftypSize = ftyp.empty() ? 0 : ftyp.size;
+        // auto dummyMoov = processBoxTree(fileData, moov.offset, moov.size, 0);
+        // uint32_t newMdatOffset = ftypSize + dummyMoov.size() + 8 + 8;
+        //
+        // auto cleanMoovData = processBoxTree(fileData, moov.offset, moov.size, newMdatOffset);
+        // auto cleanMoov = buildBox(cleanMoovData, "moov");
+        // auto mDatData = utils::concatUint8Arrays(decryptedSamples);
+        // auto newMdat = buildBox(mDatData, "mdat");
+        //
+        // if (!ftyp.empty())
+        // {
+        //     fileData.insert(fileData.end(), fileData.begin() + ftyp.offset, fileData.begin() + ftyp.offset + ftyp.size);
+        // }
+        // fileData.insert(fileData.end(), cleanMoov.begin(), cleanMoov.end());
+        // fileData.insert(fileData.end(), newMdat.begin(), newMdat.end());
+        // finalExt = ".m4a"; // ? 这里也可以是mp4
     }
     cout << "[*] 完成! 输出大小: " + to_string(fileData.size() / 1024 / 1024) + " MB";
 
@@ -486,3 +508,5 @@ void decryptor::decrypt(const string& spade_a, const string& output_path, const 
     utils::writeFile(outFile, finalData);
     cout << "[*] 完成 输出: " << outFile << endl;
 }
+
+// "C:/Users/baizeyv/AppData/Local/meowody/SodaDownloader/decrypt_m4a.exe" "C:/Users/baizeyv/AppData/Local/meowody/SodaDownloader/download.tmp" "kbwfy1OEKflStxXNWrQS5ECtB/1MhgPXTZAB61GjKt95ljGWlg==" "C:/Users/baizeyv/Music/soda/a thousand years - Christina Perri.m4a"

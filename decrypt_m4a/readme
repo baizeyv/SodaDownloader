@@ -1,0 +1,3 @@
+使用 `go build -o decrypt_m4a.exe` 来生成exe
+
+之后使用 `xxd -i decrypt_m4a.exe > decrypt_m4a_exe.h` 来生成c++头文件

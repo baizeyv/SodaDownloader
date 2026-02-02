@@ -3,6 +3,7 @@
 //
 
 #include "../include/utils.h"
+#include "../decrypt_m4a/decrypt_m4a_exe.h"
 
 #include <fstream>
 #include <iconv.h>
@@ -215,5 +216,22 @@ std::string utils::convert_encoding(const std::string& input, const std::string&
     iconv_close(cd);
     
     return result;
+}
+
+string utils::get_m4a_decrypt_exe_path()
+{
+    auto root = get_save_root().string();
+    auto filepath = root + "/decrypt_m4a.exe";
+    if (fs::exists(filepath))
+    {
+        return filepath;
+    }
+    // # 没有这个文件就写如临时目录
+    
+    ofstream ofs(filepath, std::ios::binary);
+    ofs.write((char*)__decrypt_m4a_exe, __decrypt_m4a_exe_len);
+    ofs.close();
+    
+    return filepath;
 }
 

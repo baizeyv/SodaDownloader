@@ -111,6 +111,12 @@ public:
     static std::string convert_encoding(const std::string& input, 
                              const std::string& from_encoding, 
                              const std::string& to_encoding) ;
+
+    /**
+     * * 获取 decrypt_m4a.exe 要保存的路径
+     * @return 
+     */
+    static string get_m4a_decrypt_exe_path();
 };
 
 
