@@ -39,6 +39,12 @@ void parser::inject_shared_page(const std::string& html_content)
 
     track_title = utils::convert_encoding(track_title, "UTF-8", "GBK");
     track_artist = utils::convert_encoding(track_artist, "UTF-8", "GBK");
+    utils::replace_all(track_title, "/", "&");
+    utils::replace_all(track_artist, "/", "&");
+    utils::replace_all(track_title, ",", "");
+    utils::replace_all(track_artist, ",", "");
+    utils::replace_all(track_title, "，", "");
+    utils::replace_all(track_artist, "，", "");
 
     std::cout << "track_id: " << track_id << " title: " << track_title << " artist: " << track_artist << std::endl;
 }

@@ -23,6 +23,10 @@ find_library(LEXBOR_LIBRARY
         NO_DEFAULT_PATH
 )
 
+if (MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 add_executable(SodaDownloader main.cpp
         include/parser.h
         src/parser.cpp
