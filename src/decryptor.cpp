@@ -12,7 +12,7 @@
 #include "mp4_box.h"
 #include "utils.h"
 
-void decryptor::decrypt(const string& spade_a)
+void decryptor::decrypt(const model_info& model, const media_info& media, const string& output_path)
 {
     // # 临时目录
     const auto root = utils::get_save_root().string();
@@ -23,10 +23,10 @@ void decryptor::decrypt(const string& spade_a)
     // # 加密文件内容
     vector<uint8_t> file_data = utils::read_file(file_path);
 
-    string key_hex = spade_a;
-    if (spade_a.find_first_not_of("0123456789abcdefABCDEF") != string::npos)
+    string key_hex = model.spade_a;
+    if (model.spade_a.find_first_not_of("0123456789abcdefABCDEF") != string::npos)
     {
-        key_hex = decrypt_utils::decrypt_spade_a(spade_a);
+        key_hex = decrypt_utils::decrypt_spade_a(model.spade_a);
         if (key_hex.empty())
         {
             cerr << "spade_a key decrypt failed." << endl;
@@ -159,11 +159,14 @@ void decryptor::decrypt(const string& spade_a)
         final_ext = ".m4a";
         cout << "[INF] wrap as M4A." << endl;
     }
-    
-    string out_path = root + "/test" + final_ext;
+
+    string out_path = output_path + "/[" + media.title + "] - " + media.artist + final_ext;
     utils::write_file(out_path, file_data);
     cout << "[INF] save file: " << out_path << endl;
-    utils::write_media_metadata(out_path, "TT", "BB", "CC");
+    if (!utils::write_media_metadata(out_path, media.title, media.artist, media.album))
+    {
+        cerr << "[ERR] failed to write tag." << endl;
+    }
 }
 
 vector<uint8_t> decryptor::process_box_tree(const vector<uint8_t>& data, size_t offset, size_t size, uint32_t new_mdat_offset)

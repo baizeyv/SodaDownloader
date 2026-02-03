@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 
+#include "media_info.h"
 #include "stsc_entry.h"
 
 using namespace std;
@@ -25,7 +26,7 @@ class decryptor
     
     vector<uint8_t> process_box_tree(const vector<uint8_t>& data, size_t offset, size_t size, uint32_t new_mdat_offset);
 public:
-    void decrypt(const string& spade_a);
+    void decrypt(const model_info& model, const media_info& media, const string& output_path);
 };
 
 

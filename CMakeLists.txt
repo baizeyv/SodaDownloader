@@ -39,6 +39,15 @@ add_executable(SodaDownloader main.cpp
         src/mp4_box.h
         src/utils.cpp
         src/utils.h
+        src/media_info.cpp
+        src/media_info.h
+        src/model_info.cpp
+        src/model_info.h
+        src/requester.cpp
+        src/requester.h
+        src/cxxopts.h
+        src/lyric_convertor.h
+        src/lyric_convertor.cpp
 )
 
 target_link_libraries(SodaDownloader PRIVATE CURL::libcurl)
