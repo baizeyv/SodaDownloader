@@ -1,15 +1,14 @@
 ﻿//
-// Created by baizeyv on 2/1/2026.
+// Created by baizeyv on 2/3/2026.
 //
 
-#include "../include/mp4_box.h"
+#include "mp4_box.h"
 
-#include <iostream>
 #include <stdexcept>
 
-#include "../include/utils.h"
+#include "decrypt_utils.h"
 
-MP4Box::MP4Box(uint32_t _size, std::string _type, size_t _offset, std::vector<uint8_t> _data)
+mp4_box::mp4_box(const uint32_t _size, const string& _type, const size_t _offset, const vector<uint8_t>& _data)
 {
     size = _size;
     type = _type;
@@ -17,41 +16,46 @@ MP4Box::MP4Box(uint32_t _size, std::string _type, size_t _offset, std::vector<ui
     data = _data;
 }
 
-MP4Box::MP4Box(const std::vector<uint8_t>& fileData, size_t off) : offset(off)
+mp4_box::mp4_box(const vector<uint8_t>& file_data, size_t off) : offset(off)
 {
-    if (offset + 8 > fileData.size()) throw std::runtime_error("MP4Box 构造失败: 数据太短");
+    if (offset + 8 > file_data.size())
+        throw new runtime_error("build mp4_box failed: data is too short.");
+    size = decrypt_utils::read_uint_32_big_end(file_data, offset);
+    type = decrypt_utils::read_box_type(file_data, offset);
 
-    size = utils::readUint32BE(fileData, offset);
-    type = utils::readBoxType(fileData, offset);
+    if (offset + size > file_data.size())
+        size = file_data.size() - offset; // # 防止越界
 
-    if (offset + size > fileData.size()) size = fileData.size() - offset; // 防越界
-    data = std::vector<uint8_t>(fileData.begin() + offset + 8, fileData.begin() + offset + size);
+    data = vector(file_data.begin() + offset + 8, file_data.begin() + offset + size);
 }
 
-bool MP4Box::empty() const
+bool mp4_box::empty() const
 {
     if (size == 999 && offset == 999 && type == "999")
         return true;
     return false;
 }
 
-MP4Box MP4Box::findBox(const std::vector<uint8_t>& fileData, const std::string& boxType, size_t offset, size_t end)
+mp4_box mp4_box::find_box(const vector<uint8_t>& file_data, const string& box_type, size_t offset, size_t end)
 {
-    if (end == SIZE_MAX) end = fileData.size();
+    if (end == SIZE_MAX)
+        end = file_data.size();
     size_t pos = offset;
 
     while (pos < end)
     {
-        if (pos + 8 > end) break;
+        if (pos + 8 > end)
+            break;
 
-        uint32_t size = utils::readUint32BE(fileData, pos);
-        if (size < 8 || size > end - pos) break;
+        const uint32_t size = decrypt_utils::read_uint_32_big_end(file_data, pos);
+        if (size < 8 || size > end - pos)
+            break;
 
-        std::string currentType = utils::readBoxType(fileData, pos);
-        if (currentType == boxType)
+        const string current_type = decrypt_utils::read_box_type(file_data, pos);
+        if (current_type == box_type)
         {
-            // 找到目标 Box，返回指针（注意内存管理）
-            return MP4Box(fileData, pos);
+            // # 找到目标box
+            return mp4_box(file_data, pos);
         }
         pos += size;
     }

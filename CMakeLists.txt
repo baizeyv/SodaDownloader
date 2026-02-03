@@ -6,6 +6,7 @@ find_package(CURL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Iconv REQUIRED)
+find_package(taglib REQUIRED)
 # --- vcpkg 路径手动指定 (确保路径正确) ---
 set(VCPKG_ROOT "D:/Environment/vcpkg/installed/x64-windows")
 
@@ -28,23 +29,16 @@ if (MSVC)
 endif()
 
 add_executable(SodaDownloader main.cpp
-        include/parser.h
-        src/parser.cpp
-        include/requester.h
-        src/requester.cpp
-        include/initializer.h
-        src/initializer.cpp
-        src/utils.cpp
+        src/decryptor.cpp
+        src/decryptor.h
+        src/stsc_entry.cpp
+        src/stsc_entry.h
+        src/decrypt_utils.cpp
+        src/decrypt_utils.h
         src/mp4_box.cpp
-        include/utils.h
-        include/music_info.h
-        include/mp4_box.h
-        include/box.h
-        include/decryptor.cpp
-        include/decryptor.h
-        include/StscEntry.h
-        src/lyric_convertor.cpp
-        include/lyric_convertor.h
+        src/mp4_box.h
+        src/utils.cpp
+        src/utils.h
 )
 
 target_link_libraries(SodaDownloader PRIVATE CURL::libcurl)
@@ -52,6 +46,7 @@ target_link_libraries(SodaDownloader PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(SodaDownloader PRIVATE OpenSSL::SSL)
 target_link_libraries(SodaDownloader PRIVATE OpenSSL::Crypto)
 target_link_libraries(SodaDownloader PRIVATE Iconv::Iconv)
+target_link_libraries(SodaDownloader PRIVATE TagLib::tag TagLib::tag_c TagLib::TagLib)
 
 # 5. 链接库
 if(LEXBOR_INCLUDE_DIR AND LEXBOR_LIBRARY)
