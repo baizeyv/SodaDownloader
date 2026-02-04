@@ -2,24 +2,25 @@
 // Created by baizeyv on 2/1/2026.
 //
 
-#include "../include/lyric_convertor.h"
+#include "lyric_convertor.h"
 
 #include <iomanip>
 #include <iostream>
 #include <regex>
 #include <sstream>
 
-#include "../include/utils.h"
+#include "utils.h"
 
-void lyric_convertor::save_lrc(const std::string& output_path, const parser& ps)
+
+void lyric_convertor::save_lrc(const std::string& output_path, const media_info& info)
 {
-    const auto krc = ps.get_lyric_krc();
+    const auto krc = info.lyric_krc;
     if (krc.empty())
         return;
-    const auto artist = ps.get_track_artist();
-    const auto title = ps.get_track_title();
-    const auto lrc = krc_to_lrc(ps.get_lyric_krc(), artist, title);
-    const std::string outFile = output_path + "/" + title + " - " + artist + ".lrc";
+    const auto artist = info.artist;
+    const auto title = info.title;
+    const auto lrc = krc_to_lrc(info.lyric_krc, artist, title);
+    const std::string outFile = output_path + "/[" + title + "] - " + artist + ".lrc";
     utils::write_to_file(outFile, lrc);
     std::cout << "导出歌词成功! path: "  + outFile << std::endl;
 }
