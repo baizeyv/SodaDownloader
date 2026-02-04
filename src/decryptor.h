@@ -21,11 +21,10 @@ class decryptor
     
     uint32_t g_chunk_count = 0;
     
-    
-    // todo:
-    
     vector<uint8_t> process_box_tree(const vector<uint8_t>& data, size_t offset, size_t size, uint32_t new_mdat_offset);
+    
 public:
+    
     void decrypt(const model_info& model, const media_info& media, const string& output_path);
 };
 

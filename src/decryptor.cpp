@@ -125,7 +125,7 @@ void decryptor::decrypt(const model_info& model, const media_info& media, const 
         {
             parts.push_back(sample);
         }
-        file_data = decrypt_utils::concat_uint_8_arrays(parts);
+        final_data = decrypt_utils::concat_uint_8_arrays(parts);
         final_ext = ".flac";
 
         cout << "[INF] wrap as FLAC." << endl;
@@ -153,7 +153,7 @@ void decryptor::decrypt(const model_info& model, const media_info& media, const 
                 break;
             }
         }
-        file_data = move(file_data);
+        final_data = move(file_data);
 
 
         final_ext = ".m4a";
@@ -161,7 +161,7 @@ void decryptor::decrypt(const model_info& model, const media_info& media, const 
     }
 
     string out_path = output_path + "/[" + media.title + "] - " + media.artist + final_ext;
-    utils::write_file(out_path, file_data);
+    utils::write_file(out_path, final_data);
     cout << "[INF] save file: " << out_path << endl;
     if (!utils::write_media_metadata(out_path, media.title, media.artist, media.album))
     {
